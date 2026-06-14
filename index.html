@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiniela Fútbol</title>
+<title>Version2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
@@ -66,15 +66,25 @@
   .badge-unpaid{color:var(--rojo);font-size:1.1rem;}
   .score-cell{font-weight:700;color:var(--acento);}
 
-  .match-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--borde);}
-  .match-row:last-child{border-bottom:none;}
+  .leyenda{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+  .leyenda-item{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--gris);}
+  .leyenda-box{width:16px;height:16px;border-radius:4px;flex-shrink:0;}
+  .leyenda-box.local{background:#2563eb;}
+  .leyenda-box.visita{background:#dc2626;}
 
-  .select-options{display:flex;gap:6px;justify-content:center;}
-  .opt-btn{padding:5px 10px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer;border:2px solid var(--borde);background:none;color:var(--gris);transition:.15s;}
+  .match-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--borde);flex-wrap:wrap;}
+  .match-row:last-child{border-bottom:none;}
+  .match-num{color:var(--gris);font-size:.8rem;font-weight:700;flex-shrink:0;min-width:18px;text-align:right;}
+  .match-info{flex:1;min-width:160px;font-size:.88rem;font-weight:700;}
+  .match-local-name{color:#60a5fa;}
+  .match-vs{color:var(--gris);font-weight:600;margin:0 4px;font-size:.8rem;}
+  .match-visita-name{color:#f87171;}
+  .select-options{display:flex;gap:6px;flex-shrink:0;}
+  .opt-btn{padding:5px 14px;border-radius:6px;font-weight:700;font-size:.85rem;cursor:pointer;border:2px solid var(--borde);background:none;color:var(--gris);transition:.15s;}
   .opt-btn:hover{border-color:var(--acento);color:var(--acento);}
-  .opt-btn.sel-L{border-color:var(--verde);color:var(--verde);background:rgba(22,163,74,.15);}
-  .opt-btn.sel-E{border-color:var(--amarillo);color:var(--amarillo);background:rgba(202,138,4,.15);}
-  .opt-btn.sel-V{border-color:var(--acento);color:var(--acento);background:rgba(59,130,246,.15);}
+  .opt-btn.sel-L{border-color:var(--verde);color:#fff;background:var(--verde);}
+  .opt-btn.sel-E{border-color:var(--amarillo);color:#fff;background:var(--amarillo);}
+  .opt-btn.sel-V{border-color:var(--acento);color:#fff;background:var(--acento);}
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:600px){.grid2{grid-template-columns:1fr;}}
@@ -475,23 +485,27 @@ function renderSeleccion(){
     return;
   }
   sendRow.style.display='flex';
-  cont.innerHTML = state.partidos.map((p,i)=>`
-    <div class="match-row">
-      <span style="color:var(--gris);font-size:.78rem;min-width:20px;font-weight:700">${i+1}</span>
-      <div style="flex:1;min-width:150px">
-        <span style="font-weight:700">${esc(p.home)}</span>
-        <span style="color:var(--gris);margin:0 6px;font-weight:700">vs</span>
-        <span style="font-weight:700">${esc(p.away)}</span>
-      </div>
-      <div class="select-options" data-id="${p.id}">
-        ${['L','E','V'].map(o=>{
+  cont.innerHTML =
+    '<div class="leyenda">'
+    +'<div class="leyenda-item"><div class="leyenda-box local"></div>Local</div>'
+    +'<div class="leyenda-item"><div class="leyenda-box visita"></div>Visita</div>'
+    +'</div>'
+    + state.partidos.map((p,i)=>
+      '<div class="match-row">'
+      +'<span class="match-num">'+(i+1)+'</span>'
+      +'<span class="match-info">'
+        +'<span class="match-local-name">'+esc(p.home)+'</span>'
+        +' <span class="match-vs">vs</span> '
+        +'<span class="match-visita-name">'+esc(p.away)+'</span>'
+      +'</span>'
+      +'<div class="select-options" data-id="'+p.id+'">'
+        +['L','E','V'].map(o=>{
           const sel=tmpPicks[p.id]===o;
-          return '<button class="opt-btn '+(sel?'sel-'+o:'')+'" onclick="selectPick(\''+p.id+'\',\''+o+'\',this)">'+o+'</button>';
-        }).join('')}
-      </div>
-    </div>`).join('');
-}
-
+          return '<button class="opt-btn '+(sel?'sel-'+o:'')+'" onclick="selectPick(''+p.id+'',''+o+'',this)">'+o+'</button>';
+        }).join('')
+      +'</div>'
+      +'</div>'
+    ).join('');
 window.selectPick = function(matchId,opt,btn){
   tmpPicks[matchId]=opt;
   btn.closest('[data-id]').querySelectorAll('.opt-btn').forEach(b=>b.className='opt-btn');
